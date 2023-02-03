@@ -4,7 +4,7 @@ Dalarna,False,False,False,False,False,False,0,0,?,False
 Gotland,False,False,False,False,False,False,0,0,?,False
 Gävleborg,False,False,False,False,False,False,0,0,?,False
 Halland,False,False,False,False,False,False,0,0,?,False
-Jämtland/Härjedalen,False,False,False,False,False,False,0,0,?,False
+Jämtland,False,False,False,False,False,False,0,0,?,False
 Jönköping,False,False,False,False,False,False,0,0,?,False
 Kalmar,False,False,False,False,False,False,0,0,?,False
 Kronoberg,False,False,False,False,False,False,0,0,?,False
@@ -13,7 +13,7 @@ Skåne,True,False,True,True,True,False,9,4,?,False
 Stockholm,True,False,True,True,False,False,16,0,?,False
 Sörmland,True,False,True,False,False,False,0,0,?,False
 Uppsala,True,False,True,False,False,False,0,0,?,False
-VGR,True,False,True,True,True,True,24,8,17,False
+Västra Götaland,True,False,True,True,True,True,24,8,17,False
 Värmland,True,False,False,False,False,False,0,0,?,False
 Västerbotten,False,False,False,False,False,False,0,0,?,False
 Västernorrland,True,False,False,False,False,False,0,0,?,False
