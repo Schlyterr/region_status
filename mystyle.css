@@ -1,0 +1,9 @@
+.tooltip rect {
+  stroke: black;
+  display: inline-block;
+  stroke-opacity: 0.2;
+  fill: white;
+}
+
+.tooltip .tooltiptext {
+}
