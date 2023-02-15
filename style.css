@@ -7,3 +7,7 @@
 
 .tooltip .tooltiptext {
 }
+
+.tooltip .closebutton:hover {
+  cursor: pointer;
+}
