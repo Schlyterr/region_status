@@ -1,13 +1,26 @@
 // The svg
-const svg = d3.select("svg"),
-	width = +svg.attr("width"),
-	height = +svg.attr("height");
+const svg = d3.select("svg");
+const width = +svg.attr("width");
+const height = +svg.attr("height");
 
-const keys = ["not_onboarded", "onboarded", "coordination_established", "technical_ability", "working_plan_exist", "publishing_data"]
-const colors = ['#FF0000', 'orange', '#FFFF33', 'lightgreen', '#00F000', '#007000']
+const keys = ["5", "4", "3", "2", "1"]
+const colors = ["#3dd27c", "#79db18", "#ffff00", "#ffb212", "#ff7053"]
 
-// Data and color scale
-let data = new Map()
+const columnNameToStringObject = {
+	coordination_established: "Regional samordning etablerad",
+	working_plan_exist: "Handlingsplan finns",
+	region_publishing_data: "Regionen publicerar data",
+	no_municipalities_in_region: "Antal kommuner i regionen",
+	no_participating_municipalities: "Antal medverkande kommuner",
+	no_municipalities_publishing_data: "Antal kommuner som publicerar data",
+}
+let columnNameToStringMapping = new Map(Object.entries(columnNameToStringObject))
+
+const statusMapping = {
+	"true": "Ja",
+	"false": "Nej",
+}
+
 const colorScale = d3.scaleOrdinal()
 	.domain(keys)
 	.range(colors);
@@ -15,70 +28,24 @@ const colorScale = d3.scaleOrdinal()
 // Load external data and boot
 Promise.all([
 	d3.json("https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/sweden-counties.geojson"),
-	d3.csv("https://raw.githubusercontent.com/Schlyterr/region_status/main/region_status.csv", function (d) {
-		let state = "not_onboarded"
-		switch ("True") {
-			case d.publishing_data:
-				state = "publishing_data";
-				break;
-			case d.working_plan_exist:
-				state = "working_plan_exist";
-				break;
-			case d.technical_ability:
-				state = "technical_ability";
-				break;
-			case d.coordination_established:
-				state = "coordination_established";
-				break;
-			case d.onboarded:
-				state = "onboarded";
-				break;
-		}
-		if (d.no_municipalities_publishing_data == "?") {
-			d.no_municipalities_publishing_data = "0"
-		}
-		data.set(d.name, { "state": state, "participating_municipalities": d.no_participating_municipalities, "onboarded_municipalities": d.no_municipalties_onboarded, "municipalities_publishing": d.no_municipalities_publishing_data })
-	})
+	d3.json("https://demo.entryscape.com/rowstore/dataset/8d485f03-87ec-4e43-9c76-d6267c9ae576/json")
+	.then(function (d) {
+		var data = new Map(d.results.map(i => [i.region, {
+			tooltipData: {
+				coordination_established: statusMapping[i.coordination_established.toString().toLowerCase()],
+				working_plan_exist: statusMapping[i.working_plan_exist.toString().toLowerCase()],
+				region_publishing_data: statusMapping[i.region_publishing_data.toString().toLowerCase()],
+				no_municipalities_in_region: i.no_municipalities_in_region,
+				no_participating_municipalities: i.no_participating_municipalities,
+				no_municipalities_publishing_data: i.no_municipalities_publishing_data,	
+			},
+			regionStatus: i.ndv_goal_achievement,
+		}]))
+		return data
+	}),
 ]).then(function (loadData) {
 	let topo = loadData[0]
-
-	let createLegend = function () {
-		let legend = svg.append("g")
-			.attr("class", "legend")
-	
-		legend.selectAll("mydots")
-			.data(keys)
-			.enter()
-			.append("circle")
-			.attr("cx", 620)
-			.attr("cy", function (d, i) {
-				return 45 + i * 25
-			})
-			.attr("r", 7)
-			.style("stroke", "black")
-			.style("stroke-width", 1)
-			.attr("fill", function (d) {
-				return colorScale(d);
-			})
-
-		legend.append("text")
-			.attr("x", 640)
-			.attr("y", 25)
-			.attr("font-weight", "bold")
-			.text("Region status")
-
-		legend.selectAll("labels")
-			.data(keys)
-			.enter()
-			.append("text")
-			.attr("x", 640)
-			.attr("y", function (d, i) {
-				return 50 + i * 25
-			})
-			.text(function (d) {
-				return d;
-			})
-	}
+	let data = loadData[1]
 
 	let createTooltipOnClick = function (d) {
 		let x = d3.pointer(d)[0]
@@ -89,20 +56,33 @@ Promise.all([
 		let tooltip = svg.append("g")
 			.attr("class", "tooltip")
 
+		regionName = d3.select(this).data()[0].properties.name
+		regionData = data.get(regionName).tooltipData
+		tooltipTextRows = Object.keys(regionData).length
+		tooltipHeight = 80 + tooltipTextRows*12
+
+		tooltipY = y
+		if (y+tooltipHeight > height) {
+			tooltipY = height - tooltipHeight
+		}
+
+		tooltipWidth = 280
+		tooltipX = x
+		if (x+tooltipWidth > width) {
+			tooltipX = width - tooltipWidth
+		}
+
 		tooltip.append("rect")
-			.attr("x", x)
-			.attr("y", y)
+			.attr("x", tooltipX)
+			.attr("y", tooltipY)
 			.attr("rx", 5)
 			.attr("ry", 5)
-			.attr("height", 110)
-			.attr("width", 250)
+			.attr("height", tooltipHeight)
+			.attr("width", tooltipWidth)
 		
-		regionName = d3.select(this).data()[0].properties.name
-		regionData = data.get(regionName)
-
 		tooltip.append("text")
-			.attr("x", x+230)
-			.attr("y", y+20)
+			.attr("x", tooltipX+260)
+			.attr("y", tooltipY+20)
 			.attr("dy", ".35em")
 			.attr("class", "closebutton")
 			.text("X")
@@ -111,26 +91,26 @@ Promise.all([
 			})
 
 		tooltip.append("text")
-			.attr("x", x + 10)
-			.attr("y", y + 20)
+			.attr("x", tooltipX + 10)
+			.attr("y", tooltipY + 20)
 			.attr("dy", ".35em")
 			.attr("font-weight", "bold")
 			.attr("class", "tooltiptext")
-			.text(regionName)
-
+			.text(`Region ${regionName}`)
+		
 		let i = 40
 		Object.entries(regionData).forEach(([key, value]) => {
 			tooltip.append("text")
-				.attr("x", x + 10)
-				.attr("y", y + i)
+				.attr("x", tooltipX + 10)
+				.attr("y", tooltipY + i)
 				.attr("dy", ".35em")
 				.attr("class", "tooltiptext")
-				.text(`${key}: ${value}`)
-			i += 15
+				.text(`${columnNameToStringMapping.get(key)}: ${value}`)
+			i += 18
 		})
 	}
 
-	const projection = d3.geoMercator().fitSize([width - 400, height - 200], topo)
+	const projection = d3.geoMercator().fitSize([width, height], topo)
 
 	const mapPaths = svg.append("g")
 		.selectAll("path")
@@ -140,11 +120,9 @@ Promise.all([
 	mapPaths.attr("d", d3.geoPath().projection(projection))
 		.attr("fill", function (d) {
 			let region = data.get(d.properties.name);
-			return colorScale(region.state);
+			return colorScale(region.regionStatus);
 		})
 		.attr("stroke", "black")
 
 	mapPaths.on('click', createTooltipOnClick)
-
-	createLegend()
 })
