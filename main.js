@@ -1,4 +1,3 @@
-// The svg
 const svg = d3.select("svg");
 const width = +svg.attr("width");
 const height = +svg.attr("height");
@@ -25,10 +24,10 @@ const colorScale = d3.scaleOrdinal()
 	.domain(keys)
 	.range(colors);
 
-// Load external data and boot
+// Load external data and draw plot
 Promise.all([
-	d3.json("https://raw.githubusercontent.com/codeforgermany/click_that_hood/main/public/data/sweden-counties.geojson"),
-	d3.json("https://demo.entryscape.com/rowstore/dataset/8d485f03-87ec-4e43-9c76-d6267c9ae576/json")
+	d3.json("https://vgregion.entryscape.net/store/7/resource/133"),
+	d3.json("https://vgregion.entryscape.net/rowstore/dataset/ee9a8fc0-c847-4c5a-8425-467a87852f10")
 	.then(function (d) {
 		var data = new Map(d.results.map(i => [i.region, {
 			tooltipData: {
@@ -37,12 +36,12 @@ Promise.all([
 				region_publishing_data: statusMapping[i.region_publishing_data.toString().toLowerCase()],
 				no_municipalities_in_region: i.no_municipalities_in_region,
 				no_participating_municipalities: i.no_participating_municipalities,
-				no_municipalities_publishing_data: i.no_municipalities_publishing_data,	
+				no_municipalities_publishing_data: i.no_municipalities_publishing_data,
 			},
 			regionStatus: i.ndv_goal_achievement,
 		}]))
 		return data
-	}),
+	})
 ]).then(function (loadData) {
 	let topo = loadData[0]
 	let data = loadData[1]
@@ -85,6 +84,7 @@ Promise.all([
 			.attr("y", tooltipY+20)
 			.attr("dy", ".35em")
 			.attr("class", "closebutton")
+			.attr("font-weight", "bold")
 			.text("X")
 			.on("click", function() {
 				svg.selectAll(".tooltip").remove()
@@ -125,4 +125,12 @@ Promise.all([
 		.attr("stroke", "black")
 
 	mapPaths.on('click', createTooltipOnClick)
+})
+.catch(function (err) {
+	console.error(err)
+	svg.append("text")
+	.attr("text-anchor", "middle")
+	.attr("x", width/2)
+	.attr("y", height/2)
+	.text("Something went wrong when we tried to visualize the data")
 })
