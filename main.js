@@ -3,7 +3,7 @@ const width = +svg.attr("width");
 const height = +svg.attr("height");
 
 const keys = ["5", "4", "3", "2", "1"]
-const colors = ["#3dd27c", "#79db18", "#ffff00", "#ffb212", "#ff7053"]
+const colors = ["#009135", "#79db18", "#FFFF59", "#ffb212", "#ff7053"]
 
 const columnNameToStringObject = {
 	coordination_established: "Regional samordning etablerad",
