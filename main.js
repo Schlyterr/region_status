@@ -1,3 +1,6 @@
+// (c) 2023 Schlyter Insights AB
+// This code is licensed under MIT license (see LICENSE.md for details)
+
 const svg = d3.select("svg");
 const width = +svg.attr("width");
 const height = +svg.attr("height");
