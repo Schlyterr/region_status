@@ -5,6 +5,9 @@ const height = +svg.attr("height");
 const keys = ["5", "4", "3", "2", "1"]
 const colors = ["#009135", "#79db18", "#FFFF59", "#ffb212", "#ff7053"]
 
+const geoJsonURL = "https://vgregion.entryscape.net/store/7/resource/133"
+const regionDataUrl = "https://vgregion.entryscape.net/rowstore/dataset/ee9a8fc0-c847-4c5a-8425-467a87852f10"
+
 const columnNameToStringObject = {
 	coordination_established: "Regional samordning etablerad",
 	working_plan_exist: "Handlingsplan finns",
@@ -24,10 +27,9 @@ const colorScale = d3.scaleOrdinal()
 	.domain(keys)
 	.range(colors);
 
-// Load external data and draw plot
 Promise.all([
-	d3.json("https://vgregion.entryscape.net/store/7/resource/133"),
-	d3.json("https://vgregion.entryscape.net/rowstore/dataset/ee9a8fc0-c847-4c5a-8425-467a87852f10")
+	d3.json(geoJsonURL),
+	d3.json(regionDataUrl)
 	.then(function (d) {
 		var data = new Map(d.results.map(i => [i.region, {
 			tooltipData: {
