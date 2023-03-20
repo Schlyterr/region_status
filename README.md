@@ -8,7 +8,7 @@ Visualization of regions open data publication status in Sweden
 
 ## Contribute
 
-Make a pull-request in order to contribute to the project.
+Make a pull request in order to contribute to the project.
 
 ## License
 
